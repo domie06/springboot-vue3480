@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZulinhetongDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangzhu_id as fangzhuId
+        ,a.zuke_id as zukeId
+        ,a.zulinhetong_uuid_number as zulinhetongUuidNumber
+        ,a.zulinhetong_name as zulinhetongName
+        ,a.zulinhetong_file as zulinhetongFile
+        ,a.zulinhetong_types as zulinhetongTypes
+        ,a.zulinriqi_time as zulinriqiTime
+        ,a.zulinhetong_yue as zulinhetongYue
+        ,a.zulinhetong_yajin_jine as zulinhetongYajinJine
+        ,a.zulinhetong_jine as zulinhetongJine
+        ,a.zulinhetong_content as zulinhetongContent
+        ,a.zulinhetong_yesno_types as zulinhetongYesnoTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZulinhetongView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,zuke.zuke_name as zukeName
+        ,zuke.zuke_phone as zukePhone
+        ,zuke.zuke_id_number as zukeIdNumber
+        ,zuke.zuke_photo as zukePhoto
+        ,zuke.zuke_email as zukeEmail
+        ,fangzhu.fangzhu_name as fangzhuName
+        ,fangzhu.fangzhu_phone as fangzhuPhone
+        ,fangzhu.fangzhu_id_number as fangzhuIdNumber
+        ,fangzhu.fangzhu_photo as fangzhuPhoto
+        ,fangzhu.fangzhu_email as fangzhuEmail
+
+        FROM zulinhetong  a
+        left JOIN zuke zuke ON a.zuke_id = zuke.id
+        left JOIN fangzhu fangzhu ON a.fangzhu_id = fangzhu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.fangzhuId != null and params.fangzhuId != ''">
+                and (
+                    a.fangzhu_id = #{params.fangzhuId}
+                )
+            </if>
+            <if test="params.zukeId != null and params.zukeId != ''">
+                and (
+                    a.zuke_id = #{params.zukeId}
+                )
+            </if>
+            <if test=" params.zulinhetongUuidNumber != '' and params.zulinhetongUuidNumber != null and params.zulinhetongUuidNumber != 'null' ">
+                and a.zulinhetong_uuid_number like CONCAT('%',#{params.zulinhetongUuidNumber},'%')
+            </if>
+            <if test=" params.zulinhetongName != '' and params.zulinhetongName != null and params.zulinhetongName != 'null' ">
+                and a.zulinhetong_name like CONCAT('%',#{params.zulinhetongName},'%')
+            </if>
+            <if test="params.zulinhetongTypes != null and params.zulinhetongTypes != ''">
+                and a.zulinhetong_types = #{params.zulinhetongTypes}
+            </if>
+            <if test=" params.zulinriqiTimeStart != '' and params.zulinriqiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zulinriqi_time) >= UNIX_TIMESTAMP(#{params.zulinriqiTimeStart}) ]]>
+            </if>
+            <if test=" params.zulinriqiTimeEnd != '' and params.zulinriqiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zulinriqi_time) <= UNIX_TIMESTAMP(#{params.zulinriqiTimeEnd}) ]]>
+            </if>
+            <if test="params.zulinhetongYueStart != null and params.zulinhetongYueStart != ''">
+                <![CDATA[  and a.zulinhetong_yue >= #{params.zulinhetongYueStart}   ]]>
+            </if>
+            <if test="params.zulinhetongYueEnd != null and params.zulinhetongYueEnd != ''">
+                <![CDATA[  and a.zulinhetong_yue <= #{params.zulinhetongYueEnd}   ]]>
+            </if>
+             <if test="params.zulinhetongYue != null and params.zulinhetongYue != ''">
+                and a.zulinhetong_yue = #{params.zulinhetongYue}
+             </if>
+            <if test="params.zulinhetongYajinJineStart != null ">
+                <![CDATA[  and a.zulinhetong_yajin_jine >= #{params.zulinhetongYajinJineStart}   ]]>
+            </if>
+            <if test="params.zulinhetongYajinJineEnd != null ">
+                <![CDATA[  and a.zulinhetong_yajin_jine <= #{params.zulinhetongYajinJineEnd}   ]]>
+            </if>
+            <if test="params.zulinhetongJineStart != null ">
+                <![CDATA[  and a.zulinhetong_jine >= #{params.zulinhetongJineStart}   ]]>
+            </if>
+            <if test="params.zulinhetongJineEnd != null ">
+                <![CDATA[  and a.zulinhetong_jine <= #{params.zulinhetongJineEnd}   ]]>
+            </if>
+            <if test=" params.zulinhetongContent != '' and params.zulinhetongContent != null and params.zulinhetongContent != 'null' ">
+                and a.zulinhetong_content like CONCAT('%',#{params.zulinhetongContent},'%')
+            </if>
+            <if test="params.zulinhetongYesnoTypes != null and params.zulinhetongYesnoTypes != ''">
+                and a.zulinhetong_yesno_types = #{params.zulinhetongYesnoTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断租客的id不为空 -->
+            <if test=" params.zukeIdNotNull != '' and params.zukeIdNotNull != null and params.zukeIdNotNull != 'null' ">
+                and a.zuke_id IS NOT NULL
+            </if>
+            <if test=" params.zukeName != '' and params.zukeName != null and params.zukeName != 'null' ">
+                and zuke.zuke_name like CONCAT('%',#{params.zukeName},'%')
+            </if>
+            <if test=" params.zukePhone != '' and params.zukePhone != null and params.zukePhone != 'null' ">
+                and zuke.zuke_phone like CONCAT('%',#{params.zukePhone},'%')
+            </if>
+            <if test=" params.zukeIdNumber != '' and params.zukeIdNumber != null and params.zukeIdNumber != 'null' ">
+                and zuke.zuke_id_number like CONCAT('%',#{params.zukeIdNumber},'%')
+            </if>
+            <if test=" params.zukeEmail != '' and params.zukeEmail != null and params.zukeEmail != 'null' ">
+                and zuke.zuke_email like CONCAT('%',#{params.zukeEmail},'%')
+            </if>
+                <!-- 判断房主的id不为空 -->
+            <if test=" params.fangzhuIdNotNull != '' and params.fangzhuIdNotNull != null and params.fangzhuIdNotNull != 'null' ">
+                and a.fangzhu_id IS NOT NULL
+            </if>
+            <if test=" params.fangzhuName != '' and params.fangzhuName != null and params.fangzhuName != 'null' ">
+                and fangzhu.fangzhu_name like CONCAT('%',#{params.fangzhuName},'%')
+            </if>
+            <if test=" params.fangzhuPhone != '' and params.fangzhuPhone != null and params.fangzhuPhone != 'null' ">
+                and fangzhu.fangzhu_phone like CONCAT('%',#{params.fangzhuPhone},'%')
+            </if>
+            <if test=" params.fangzhuIdNumber != '' and params.fangzhuIdNumber != null and params.fangzhuIdNumber != 'null' ">
+                and fangzhu.fangzhu_id_number like CONCAT('%',#{params.fangzhuIdNumber},'%')
+            </if>
+            <if test=" params.fangzhuEmail != '' and params.fangzhuEmail != null and params.fangzhuEmail != 'null' ">
+                and fangzhu.fangzhu_email like CONCAT('%',#{params.fangzhuEmail},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
